@@ -2,20 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* กำหนดตัวแปรสีพื้นฐาน */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ffffff; /* พื้นหลังสีขาว */
+  --foreground-light: #171717; /* สีข้อความสำหรับ Light Mode */
+  --foreground-dark: #ededed; /* สีข้อความสำหรับ Dark Mode */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ธีมเริ่มต้น */
 body {
-  color: var(--foreground);
-  background: var(--background);
+  background: var(--background); /* พื้นหลังคงเป็นสีขาว */
+  color: var(--foreground-light); /* สีข้อความสำหรับ Light Mode */
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* รองรับ Dark Mode สำหรับข้อความ */
+@media (prefers-color-scheme: dark) {
+  body {
+    color: var(--foreground-dark); /* สีข้อความเปลี่ยนตามธีม Dark Mode */
+  }
 }
