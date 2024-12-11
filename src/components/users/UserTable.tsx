@@ -69,12 +69,23 @@ const UserTable = () => {
 
   const handleDeleteUser = async (userId: number) => {
     try {
+      const token = localStorage.getItem("token"); // Retrieve the JWT token
+
+      if (!token) {
+        alert("You are not authenticated. Please log in.");
+        return;
+      }
+
       const response = await fetch(`/api/users/${userId}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`, // Add token to Authorization header
+          "Content-Type": "application/json",
+        },
       });
 
       if (response.ok) {
-        setUsers(users.filter((user) => user.id !== userId)); // Remove user from the list
+        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId)); // Update the state to remove the user
         console.log("User deleted successfully!");
       } else {
         const errorData = await response.json();

@@ -38,7 +38,13 @@ const EditUserModal = ({
     setError(null);
 
     try {
-      console.log(editUser);
+      const token = localStorage.getItem("token"); // Retrieve the JWT token
+
+      if (!token) {
+        setError("You are not authenticated. Please log in.");
+        return;
+      }
+
       const data = {
         fullName: editUser.fullName,
         email: editUser.email,
@@ -46,10 +52,13 @@ const EditUserModal = ({
         status: editUser.status,
       };
 
+      console.log("Edit User Data:", JSON.stringify(data, null, 2));
+
       const response = await fetch(`/api/users/${editUser.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
         },
         body: JSON.stringify(data),
       });

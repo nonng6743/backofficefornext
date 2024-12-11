@@ -1,14 +1,21 @@
 import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import prisma from "../../../../../lib/prisma"; // Adjust this path to match your project structure
+import { verifyToken } from "../../../../../lib/jwt"; // Import your JWT utility
 
 // Fetch user by ID
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { id } = params;
 
   try {
+    const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+    if (!token || !verifyToken(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: Number(id) },
     });
@@ -29,12 +36,17 @@ export async function GET(
 
 // Update user by ID
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { id } = params;
 
   try {
+    const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+    if (!token || !verifyToken(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
 
     const updatedUser = await prisma.user.update({
@@ -59,14 +71,21 @@ export async function PUT(
 
 // Delete user by ID
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params; // Ensure `params` is correctly passed
+  const { id } = params;
+
   try {
+    const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+    if (!token || !verifyToken(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const user = await prisma.user.delete({
       where: { id: Number(id) },
     });
+
     return NextResponse.json({ message: "User deleted successfully" });
   } catch (error) {
     console.error("Error deleting user:", error);

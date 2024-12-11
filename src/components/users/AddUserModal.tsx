@@ -23,11 +23,21 @@ const AddUserModal = ({ roles, onClose, fetchUsers }: AddUserModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
     try {
+      const token = localStorage.getItem("token"); // Retrieve the JWT token from local storage
+      console.log(token)
+
+      if (!token) {
+        setError("You are not authenticated. Please log in.");
+        return;
+      }
+
       const response = await fetch("/api/users/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the JWT token in the Authorization header
         },
         body: JSON.stringify(newUser),
       });
