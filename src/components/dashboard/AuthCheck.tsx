@@ -13,7 +13,7 @@ const AuthCheck = ({ children }: { children: React.ReactNode }) => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        router.push("/login"); // เปลี่ยนเส้นทางไปหน้า Login หากไม่มี Token
+        router.push("/login");
         return;
       }
 
@@ -29,10 +29,12 @@ const AuthCheck = ({ children }: { children: React.ReactNode }) => {
         if (response.ok) {
           setIsAuthenticated(true);
         } else {
-          router.push("/login");
+          localStorage.removeItem("token"); // ลบ Token เมื่อไม่ถูกต้องหรือหมดอายุ
+          router.push("/login"); // เปลี่ยนเส้นทางไปหน้า Login
         }
       } catch (error) {
         console.error("Error verifying token:", error);
+        localStorage.removeItem("token");
         router.push("/login");
       } finally {
         setLoading(false);
@@ -47,10 +49,10 @@ const AuthCheck = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!isAuthenticated) {
-    return null; // หากไม่ได้รับการตรวจสอบ ไม่แสดงหน้า
+    return null;
   }
 
-  return <>{children}</>; // แสดง Children เมื่อได้รับการตรวจสอบ
+  return <>{children}</>;
 };
 
 export default AuthCheck;
