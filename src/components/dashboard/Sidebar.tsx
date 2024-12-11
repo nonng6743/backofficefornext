@@ -1,14 +1,31 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { FaHome, FaUser, FaBox, FaFileExcel, FaCog } from "react-icons/fa";
+import { useRouter, usePathname } from "next/navigation";
+import { FaHome, FaUser, FaBox, FaFileExcel, FaCog, FaChevronDown } from "react-icons/fa";
+
+// ประเภทของเมนู
+type SubMenuItem = {
+  label: string;
+  path: string;
+  action?: () => void;
+};
+
+type MenuItem = {
+  label: string;
+  path?: string;
+  icon: React.ReactNode;
+  action?: () => void;
+  subItems?: SubMenuItem[];
+};
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false); // State สำหรับเปิด/ปิด Sidebar
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false); // State สำหรับเปิด/ปิดเมนูย่อย
   const router = useRouter();
+  const pathname = usePathname(); // ดึง URL ปัจจุบัน
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     { label: "Dashboard", path: "/dashboard", icon: <FaHome /> },
     { label: "Users", path: "/users", icon: <FaUser /> },
     {
@@ -17,8 +34,26 @@ const Sidebar = () => {
       icon: <FaBox />,
     },
     { label: "Excel Report", path: "/excel-report", icon: <FaFileExcel /> },
-    { label: "Settings", path: "/setting", icon: <FaCog /> },
+    {
+      label: "Settings",
+      icon: <FaCog />,
+      subItems: [
+        { label: "Profile Settings", path: "/settings/profile" },
+        { label: "Account Settings", path: "/settings/account" },
+      ],
+    },
+    
   ];
+
+  const handleItemClick = (item: MenuItem | SubMenuItem) => {
+    if (item.action) {
+      item.action(); // เรียกใช้งาน action ถ้ามี
+    }
+    if (item.path) {
+      router.push(item.path); // นำทางไปยัง path ถ้ามี
+    }
+    setIsOpen(false); // ปิด Sidebar หลังเลือก
+  };
 
   return (
     <>
@@ -45,16 +80,50 @@ const Sidebar = () => {
           <ul className="space-y-2">
             {menuItems.map((item, index) => (
               <li key={index}>
-                <button
-                  className="w-full text-left px-4 py-2 flex items-center space-x-4 text-white hover:bg-[rgb(33,42,68)] hover:shadow-md transition-all rounded-md"
-                  onClick={() => {
-                    router.push(item.path);
-                    setIsOpen(false); // ปิด Sidebar เมื่อเลือกเมนู
-                  }}
-                >
-                  <span className="text-xl">{item.icon}</span>
-                  <span>{item.label}</span>
-                </button>
+                {item.subItems ? (
+                  <>
+                    <button
+                      className={`w-full text-left px-4 py-2 flex items-center space-x-4 hover:bg-[rgb(33,42,68)] hover:shadow-md transition-all rounded-md ${
+                        pathname.startsWith("/settings") ? "bg-[rgb(33,42,68)]" : ""
+                      }`}
+                      onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                    >
+                      <span className="text-xl">{item.icon}</span>
+                      <span>{item.label}</span>
+                      <FaChevronDown
+                        className={`ml-auto transition-transform ${
+                          isSettingsOpen ? "rotate-180" : "rotate-0"
+                        }`}
+                      />
+                    </button>
+                    {isSettingsOpen && (
+                      <ul className="ml-8 mt-2 space-y-2">
+                        {item.subItems.map((subItem, subIndex) => (
+                          <li key={subIndex}>
+                            <button
+                              className={`w-full text-left px-4 py-2 text-sm hover:bg-[rgb(33,42,68)] hover:shadow-md transition-all rounded-md ${
+                                pathname === subItem.path ? "bg-[rgb(33,42,68)]" : ""
+                              }`}
+                              onClick={() => handleItemClick(subItem)}
+                            >
+                              {subItem.label}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                ) : (
+                  <button
+                    className={`w-full text-left px-4 py-2 flex items-center space-x-4 hover:bg-[rgb(33,42,68)] hover:shadow-md transition-all rounded-md ${
+                      pathname === item.path ? "bg-[rgb(33,42,68)]" : ""
+                    }`}
+                    onClick={() => handleItemClick(item)}
+                  >
+                    <span className="text-xl">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </button>
+                )}
               </li>
             ))}
           </ul>
