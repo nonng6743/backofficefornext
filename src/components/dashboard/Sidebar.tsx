@@ -27,7 +27,7 @@ const Sidebar = () => {
 
   const menuItems: MenuItem[] = [
     { label: "Dashboard", path: "/dashboard", icon: <FaHome /> },
-    { label: "Users", path: "/users", icon: <FaUser /> },
+    { label: "Users", path: "/backoffice/users/userlist", icon: <FaUser /> },
     {
       label: "Product Management",
       path: "/product-management",
