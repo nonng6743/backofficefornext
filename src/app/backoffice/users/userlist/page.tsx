@@ -3,6 +3,7 @@ import Navbar from "@/components/dashboard/Navbar";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DashboardContent from "@/components/dashboard/DashboardContent";
 import AuthCheck from "@/components/dashboard/AuthCheck";
+import UserTable from "@/components/users/UserTable";
 
 const DashboardPage = () => {
   return (
@@ -20,7 +21,7 @@ const DashboardPage = () => {
 
           {/* Content */}
           <main className="flex-1 p-4 sm:p-6 flex flex-col items-center sm:items-start ">
-            <DashboardContent />
+            <UserTable />
           </main>
         </div>
       </div>
