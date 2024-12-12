@@ -28,6 +28,7 @@ const UserTable = () => {
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>(""); // State for search query
 
   const fetchUsers = async () => {
     try {
@@ -98,10 +99,19 @@ const UserTable = () => {
     }
   };
 
-  const totalPages = Math.ceil(users.length / itemsPerPage);
+  // Filter users based on the search query
+  const filteredUsers = users.filter(
+    (user) =>
+      user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.status.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const indexOfLastUser = currentPage * itemsPerPage;
   const indexOfFirstUser = indexOfLastUser - itemsPerPage;
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -121,6 +131,17 @@ const UserTable = () => {
         >
           Add User
         </button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by name, email, role, or status"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 text-gray-700"
+        />
       </div>
 
       <div className="overflow-x-auto">
