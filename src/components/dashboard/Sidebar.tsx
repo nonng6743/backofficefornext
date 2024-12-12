@@ -26,7 +26,7 @@ const Sidebar = () => {
   const pathname = usePathname(); // ดึง URL ปัจจุบัน
 
   const menuItems: MenuItem[] = [
-    { label: "Dashboard", path: "/dashboard", icon: <FaHome /> },
+    { label: "Dashboard", path: "/backoffice/dashboard", icon: <FaHome /> },
     { label: "Users", path: "/backoffice/users/userlist", icon: <FaUser /> },
     {
       label: "Product Management",

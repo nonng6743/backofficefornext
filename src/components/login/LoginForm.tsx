@@ -38,7 +38,7 @@ const LoginForm = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.token); // Store the token
-        router.push("/dashboard"); // Navigate to Dashboard
+        router.push("/backoffice/dashboard"); // Navigate to Dashboard
       } else {
         const data = await response.json();
         setError(data.error || "Login failed. Please try again.");
