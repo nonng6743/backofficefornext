@@ -1,8 +1,8 @@
 import React from "react";
-import Navbar from "@/components/dashboard/Navbar";
-import Sidebar from "@/components/dashboard/Sidebar";
-import DashboardContent from "@/components/dashboard/DashboardContent";
-import AuthCheck from "@/components/dashboard/AuthCheck";
+import Navbar from "@/components/backoffice/dashboard/Navbar";
+import Sidebar from "@/components/backoffice/dashboard/Sidebar";
+import DashboardContent from "@/components/backoffice/dashboard/DashboardContent";
+import AuthCheck from "@/components/backoffice/dashboard/AuthCheck";
 
 const DashboardPage = () => {
   return (
