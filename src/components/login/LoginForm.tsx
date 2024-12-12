@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import jwt from "jsonwebtoken";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ const LoginForm = () => {
     setError("");
 
     try {
-        console.log(formData)
+      console.log(formData);
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -38,12 +39,30 @@ const LoginForm = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.token); // Store the token
-        router.push("/backoffice/dashboard"); // Navigate to Dashboard
+
+        // Decode the token
+        const decodedToken = jwt.decode(data.token);
+        if (decodedToken && typeof decodedToken === "object") {
+          console.log("Decoded Token:", decodedToken);
+
+          // Check the role field
+          if (decodedToken.role === 1) {
+            router.push("/backoffice/dashboard");
+          } else {
+            router.push("/dashboard");
+          }
+        } else {
+          console.error("Failed to decode token or invalid token structure.");
+          setError("Invalid token received.");
+        }
+
+        // router.push("/backoffice/dashboard"); // Navigate to Dashboard
       } else {
         const data = await response.json();
         setError(data.error || "Login failed. Please try again.");
       }
     } catch (err) {
+      console.error("Login Error:", err);
       setError("An error occurred. Please try again.");
     }
   };
@@ -56,7 +75,11 @@ const LoginForm = () => {
       {error && (
         <p className="text-center text-sm text-red-500 mb-4">{error}</p>
       )}
-      <form onSubmit={handleSubmit} className="space-y-6" aria-label="Login Form">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6"
+        aria-label="Login Form"
+      >
         <div>
           <label
             htmlFor="email"

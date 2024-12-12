@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import jwt from "jsonwebtoken";
 
 const AuthCheck = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -18,24 +19,24 @@ const AuthCheck = ({ children }: { children: React.ReactNode }) => {
       }
 
       try {
-        const response = await fetch("/api/auth/verify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        // Decode the token to check the role
+        const decodedToken = jwt.decode(token);
 
-        if (response.ok) {
-          setIsAuthenticated(true);
+        if (decodedToken && typeof decodedToken === "object") {
+          const userRole = decodedToken.role;
+
+          if (userRole === 1) {
+            setIsAuthorized(true);
+          } else {
+            router.push("/dashboard"); // Redirect non-admin users to dashboard
+          }
         } else {
-          localStorage.removeItem("token"); // ลบ Token เมื่อไม่ถูกต้องหรือหมดอายุ
-          router.push("/login"); // เปลี่ยนเส้นทางไปหน้า Login
+          throw new Error("Invalid token structure");
         }
       } catch (error) {
         console.error("Error verifying token:", error);
-        localStorage.removeItem("token");
-        router.push("/login");
+        localStorage.removeItem("token"); // Remove invalid token
+        router.push("/login"); // Redirect to login page
       } finally {
         setLoading(false);
       }
@@ -48,8 +49,8 @@ const AuthCheck = ({ children }: { children: React.ReactNode }) => {
     return <div>Loading...</div>;
   }
 
-  if (!isAuthenticated) {
-    return null;
+  if (!isAuthorized) {
+    return null; // Prevent rendering content for unauthorized users
   }
 
   return <>{children}</>;

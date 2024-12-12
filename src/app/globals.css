@@ -17,8 +17,8 @@ body {
 }
 
 /* รองรับ Dark Mode สำหรับข้อความ */
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   body {
-    color: var(--foreground-dark); /* สีข้อความเปลี่ยนตามธีม Dark Mode */
+    color: var(--foreground-light); /* สีข้อความเปลี่ยนตามธีม Dark Mode */
   }
 }

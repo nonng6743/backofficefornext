@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: user.id, email: user.email, fullname: user.fullName },
+      { id: user.id, email: user.email, fullname: user.fullName , role: user.roleId},
       process.env.JWT_SECRET,
       { expiresIn: "1d" } // Token expires in 1 day
     );
