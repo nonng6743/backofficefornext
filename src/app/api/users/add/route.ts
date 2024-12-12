@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const { fullName, email, password, roleId } = body;
 
     // Validate required fields
-    if (!fullName || !email || !password || !roleId) {
+    if (!fullName?.trim() || !email?.trim() || !password || !roleId) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 }
@@ -39,14 +39,21 @@ export async function POST(req: Request) {
       );
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Ensure the encryption key exists
+    const encryptionKey = process.env.ENCRYPTION_KEY;
+    if (!encryptionKey) {
+      throw new Error("Missing ENCRYPTION_KEY in environment variables");
+    }
+
+    // Hash the password with the encryption key
+    const combinedPassword = password + encryptionKey;
+    const hashedPassword = await bcrypt.hash(combinedPassword, 10);
 
     // Create the new user
     const newUser = await prisma.user.create({
       data: {
-        fullName,
-        email,
+        fullName: fullName.trim(),
+        email: email.trim(),
         password: hashedPassword,
         roleId,
       },
@@ -58,7 +65,10 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     // Log detailed error information
-    console.error("Error adding user:", error instanceof Error ? error.message : error);
+    console.error(
+      "Error adding user:",
+      error instanceof Error ? error.message : error
+    );
 
     // Return a sanitized error response
     return NextResponse.json(

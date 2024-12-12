@@ -9,6 +9,7 @@ const LoginForm = () => {
     password: "",
   });
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,11 +17,16 @@ const LoginForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     try {
+        console.log(formData)
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -31,13 +37,12 @@ const LoginForm = () => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("token", data.token); // เก็บ Token
-        router.push("/dashboard"); // เปลี่ยนเส้นทางไป Dashboard
+        localStorage.setItem("token", data.token); // Store the token
+        router.push("/dashboard"); // Navigate to Dashboard
       } else {
         const data = await response.json();
         setError(data.error || "Login failed. Please try again.");
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError("An error occurred. Please try again.");
     }
@@ -78,17 +83,55 @@ const LoginForm = () => {
           >
             Password
           </label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            placeholder="Enter your password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-4 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            autoComplete="current-password"
-            required
-          />
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-4 py-2 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoComplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute inset-y-0 right-3 flex items-center text-gray-500 focus:outline-none"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M17.94 17.94A10.05 10.05 0 0 1 12 19C4.82 19 1 12 1 12s3.82-7 11-7c1.96 0 3.79.5 5.34 1.34M23 23l-2-2m-3.5-3.5c-.98.49-2.09.76-3.5.76-6.18 0-9-6-9-6s.5-1.08 1.29-2.36" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
         <button
           type="submit"
@@ -97,15 +140,6 @@ const LoginForm = () => {
           Login
         </button>
       </form>
-      <div className="mt-4 text-center">
-        <p className="text-sm text-gray-500">Don&apos;t have an account?</p>
-        <button
-          onClick={() => router.push("/register")}
-          className="text-blue-500 hover:underline"
-        >
-          Register
-        </button>
-      </div>
     </div>
   );
 };
