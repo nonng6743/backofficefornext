@@ -7,69 +7,81 @@ Chart.register(...registerables);
 
 const InvestmentPieChart: React.FC = () => {
   const chartRef = useRef<HTMLCanvasElement>(null);
+  const chartInstanceRef = useRef<Chart | null>(null);
 
   useEffect(() => {
-    if (chartRef.current) {
-      const ctx = chartRef.current.getContext("2d");
+    const ctx = chartRef.current?.getContext("2d");
+    if (!ctx) return;
 
-      if (ctx) {
-        new Chart(ctx, {
-          type: "pie",
-          data: {
-            labels: ["Stocks", "Bonds", "Real Estate", "Cryptocurrency"],
-            datasets: [
-              {
-                label: "Portfolio Distribution",
-                data: [40000, 20000, 30000, 10000], // Example data (values in currency)
-                backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
-                borderWidth: 1,
-              },
-            ],
+    // Destroy existing chart instance if it exists
+    if (chartInstanceRef.current) {
+      chartInstanceRef.current.destroy();
+    }
+
+    // Create new chart instance
+    chartInstanceRef.current = new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: ["Stocks", "Bonds", "Real Estate", "Cryptocurrency"],
+        datasets: [
+          {
+            label: "Portfolio Distribution",
+            data: [40000, 20000, 30000, 10000], // Example data (values in currency)
+            backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
+            borderWidth: 1,
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false, // Allow flexible resizing
-            plugins: {
-              legend: {
-                position: "bottom",
-                labels: {
-                  font: {
-                    size: 14,
-                  },
-                  padding: 10,
-                  usePointStyle: true, // Add point style for better appearance
-                  boxWidth: 10,
-                  generateLabels: (chart) => {
-                    const data = chart.data;
-                    if (
-                      data.labels &&
-                      Array.isArray(data.datasets[0].backgroundColor)
-                    ) {
-                      return data.labels.map((label, index) => ({
-                        text: `${label}: $${data.datasets[0].data[index]}`,
-                        fillStyle: (
-                          data.datasets[0].backgroundColor as string[]
-                        )[index],
-                      }));
-                    }
-                    return [];
-                  },
-                },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false, // Allow flexible resizing
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              font: {
+                size: 14,
               },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    const value = context.raw;
-                    const label = context.label || "";
-                    return `${label}: $${value}`;
-                  },
-                },
+              padding: 10,
+              usePointStyle: true, // Add point style for better appearance
+              boxWidth: 10,
+              generateLabels: (chart) => {
+                const data = chart.data;
+                if (
+                  data.labels &&
+                  Array.isArray(data.datasets[0].backgroundColor)
+                ) {
+                  return data.labels.map((label, index) => ({
+                    text: `${label}: $${data.datasets[0].data[index]}`,
+                    fillStyle: (
+                      data.datasets[0].backgroundColor as string[]
+                    )[index],
+                  }));
+                }
+                return [];
               },
             },
           },
-        });
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const value = context.raw;
+                const label = context.label || "";
+                return `${label}: $${value}`;
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Cleanup function to destroy chart instance on unmount
+    return () => {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
       }
-    }
+    };
   }, []);
 
   return (
