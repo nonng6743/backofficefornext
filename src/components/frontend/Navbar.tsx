@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 const Navbar: React.FC = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Toggle for mobile menu
   const router = useRouter();
 
   useEffect(() => {
@@ -30,8 +31,8 @@ const Navbar: React.FC = () => {
           <Link href="/">BrandLogo</Link>
         </div>
 
-        {/* Menu Items */}
-        <ul className="flex space-x-8 items-center">
+        {/* Desktop Menu */}
+        <ul className="hidden md:flex space-x-8 items-center">
           <li>
             <Link
               href="/"
@@ -64,7 +65,6 @@ const Navbar: React.FC = () => {
               {/* Dropdown Button */}
               <button
                 id="dropdownDefaultButton"
-                data-dropdown-toggle="dropdown"
                 className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center"
                 type="button"
                 onClick={() => setIsDropdownVisible(!isDropdownVisible)}
@@ -135,7 +135,101 @@ const Navbar: React.FC = () => {
             </li>
           )}
         </ul>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden text-gray-700 focus:outline-none"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d={
+                isMenuOpen
+                  ? "M6 18L18 6M6 6l12 12"
+                  : "M4 6h16M4 12h16M4 18h16"
+              }
+            />
+          </svg>
+        </button>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <ul className="md:hidden bg-white border-t border-gray-200">
+          <li>
+            <Link
+              href="/"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+            >
+              Home
+            </Link>
+          </li>
+          {!isAuthenticated ? (
+            <>
+              <li>
+                <Link
+                  href="/login"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                >
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/register"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                >
+                  Register
+                </Link>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link
+                  href="/dashboard"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                >
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/settings"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                >
+                  Settings
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/earnings"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                >
+                  Earnings
+                </Link>
+              </li>
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+                >
+                  Sign out
+                </button>
+              </li>
+            </>
+          )}
+        </ul>
+      )}
     </nav>
   );
 };
