@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import jwt from "jsonwebtoken";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const AuthCheck = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
@@ -46,7 +47,7 @@ const AuthCheck = ({ children }: { children: React.ReactNode }) => {
   }, [router]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   if (!isAuthorized) {

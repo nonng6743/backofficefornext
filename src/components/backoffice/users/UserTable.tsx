@@ -27,7 +27,6 @@ const UserTable = () => {
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>(""); // State for search query
 
   const fetchUsers = async () => {
